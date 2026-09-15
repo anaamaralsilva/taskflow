@@ -120,7 +120,45 @@ if (!response.ok) {
     console.error(error);
   }
 };
+const handleDeleteTask = async (taskId: number) => {
+  const confirmed = window.confirm(
+  "Tem certeza que deseja excluir esta tarefa?"
+);
 
+if (!confirmed) {
+  return;
+}
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `http://localhost:5025/api/tasks/${taskId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/");
+      return;
+    }
+
+    if (!response.ok) {
+      console.error("Erro ao excluir tarefa");
+      return;
+    }
+
+    setTasks((currentTasks) =>
+      currentTasks.filter((task) => task.id !== taskId)
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
  return (
   <div className="project-details-page">
     <div className="project-details-container">
@@ -214,6 +252,13 @@ if (!response.ok) {
                       Prazo:{" "}
                       {new Date(task.dueDate).toLocaleDateString("pt-BR")}
                     </p>
+                    
+                    <button
+                     className="delete-task-button"
+                     onClick={() => handleDeleteTask(task.id)}
+                   >
+                    Excluir
+                  </button>
                   </div>
                 ))}
               </div>
