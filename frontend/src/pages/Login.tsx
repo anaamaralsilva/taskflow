@@ -55,6 +55,14 @@ function Login() {
       />
 
       <button onClick={handleLogin}>Entrar</button>
+
+      <button onClick={() => navigate("/register")}>
+        Cadastre-se
+      </button>
+
+      <button onClick={() => navigate("/forgot-password")}>
+        Esqueci minha senha
+      </button>
     </div>
   );
 }

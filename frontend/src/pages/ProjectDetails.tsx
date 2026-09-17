@@ -12,8 +12,10 @@ function ProjectDetails() {
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [taskPriority, setTaskPriority] = useState("Medium");
+  const [taskStatus, setTaskStatus] = useState("Pending");
   const [taskDueDate, setTaskDueDate] = useState("");
   const [taskError, setTaskError] = useState("");
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
   useEffect(() => {
   const loadProject = async () => {
@@ -90,6 +92,7 @@ setTaskError("");
       body: JSON.stringify({
         title: taskTitle,
         description: taskDescription,
+        status: taskStatus,
         priority: taskPriority,
         dueDate: taskDueDate,
         projectId: Number(id),
@@ -114,6 +117,7 @@ if (!response.ok) {
     setTaskTitle("");
     setTaskDescription("");
     setTaskPriority("Medium");
+    setTaskStatus("Pending");
     setTaskDueDate("");
     setShowTaskForm(false);
   } catch (error) {
@@ -159,6 +163,81 @@ if (!confirmed) {
     console.error(error);
   }
 };
+
+const handleEditTask = (task: any) => {
+  setEditingTaskId(task.id);
+  setTaskTitle(task.title);
+  setTaskDescription(task.description);
+  setTaskPriority(task.priority);
+  setTaskStatus(task.status);
+  setTaskDueDate(task.dueDate.split("T")[0]);
+  setTaskError("");
+  setShowTaskForm(true);
+};
+
+const handleUpdateTask = async () => {
+  if (!editingTaskId) {
+    return;
+  }
+
+  if (!taskTitle.trim() || !taskDueDate) {
+    setTaskError("Preencha o título e o prazo da tarefa.");
+    return;
+  }
+
+  setTaskError("");
+
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `http://localhost:5025/api/tasks/${editingTaskId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: taskTitle,
+          description: taskDescription,
+          status: taskStatus,
+          priority: taskPriority,
+          dueDate: taskDueDate,
+        }),
+      }
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/");
+      return;
+    }
+
+    if (!response.ok) {
+      console.error("Erro ao atualizar tarefa");
+      return;
+    }
+
+    const updatedTask = await response.json();
+
+    setTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === editingTaskId ? updatedTask : task
+      )
+    );
+
+    setTaskTitle("");
+    setTaskDescription("");
+    setTaskPriority("Medium");
+    setTaskDueDate("");
+    setEditingTaskId(null);
+    setShowTaskForm(false);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
  return (
   <div className="project-details-page">
     <div className="project-details-container">
@@ -223,6 +302,15 @@ if (!confirmed) {
       <option value="High">Alta</option>
     </select>
 
+    <select
+  value={taskStatus}
+  onChange={(e) => setTaskStatus(e.target.value)}
+>
+  <option value="Pending">Pendente</option>
+  <option value="In Progress">Em andamento</option>
+  <option value="Completed">Concluída</option>
+</select>
+
     <input
       type="date"
       value={taskDueDate}
@@ -234,8 +322,10 @@ if (!confirmed) {
         Cancelar
       </button>
 
-      <button onClick={handleCreateTask}>
-        Criar Tarefa
+      <button
+       onClick={editingTaskId ? handleUpdateTask : handleCreateTask}
+      >
+        {editingTaskId ? "Salvar Alterações" : "Criar Tarefa"}
      </button>
     </div>
   </div>
@@ -252,6 +342,13 @@ if (!confirmed) {
                       Prazo:{" "}
                       {new Date(task.dueDate).toLocaleDateString("pt-BR")}
                     </p>
+
+                    <button
+                     className="edit-task-button"
+                     onClick={() => handleEditTask(task)}
+                    >
+                     Editar
+                    </button>
                     
                     <button
                      className="delete-task-button"

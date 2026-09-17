@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.API.Data;
 using TaskFlow.API.DTOs;
+using TaskFlow.API.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -90,6 +91,89 @@ var tokenValue = new JwtSecurityTokenHandler()
           }  
         });
     }
+[HttpPost("register")]
+public async Task<IActionResult> Register(RegisterUserRequest request)
+{
+    var emailExists = await _context.Users
+        .AnyAsync(u => u.Email == request.Email);
+
+    if (emailExists)
+    {
+        return BadRequest(new
+        {
+            message = "Email already registered."
+        });
+    }
+
+    var user = new User
+    {
+        Name = request.Name,
+        Email = request.Email,
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
+    };
+
+    _context.Users.Add(user);
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        message = "User registered successfully."
+    });
+}
+
+[HttpPost("forgot-password")]
+public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
+{
+    var user = await _context.Users
+        .FirstOrDefaultAsync(u => u.Email == request.Email);
+
+    if (user is null)
+    {
+        return Ok(new
+        {
+            message = "Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha."
+        });
+    }
+
+user.PasswordResetToken = Guid.NewGuid().ToString();
+
+user.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
+await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        message = "Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha."
+    });
+}
+[HttpPost("reset-password")]
+public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+{
+    var user = await _context.Users
+        .FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
+
+    if (user is null ||
+        user.PasswordResetTokenExpiresAt is null ||
+        user.PasswordResetTokenExpiresAt < DateTime.UtcNow)
+    {
+        return BadRequest(new
+        {
+            message = "Token inválido ou expirado."
+        });
+    }
+
+    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+    user.PasswordResetToken = null;
+    user.PasswordResetTokenExpiresAt = null;
+
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        message = "Senha redefinida com sucesso."
+    });
+}
 
 [Authorize]
 [HttpGet("protected")]

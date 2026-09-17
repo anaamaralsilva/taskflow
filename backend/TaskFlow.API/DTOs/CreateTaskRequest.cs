@@ -13,6 +13,8 @@ public class CreateTaskRequest
     [Required]
     public string Priority { get; set; } = "Medium";
 
+    public string Status { get; set; } = "Pending";
+
     [Required]
     public DateTime DueDate { get; set; }
 

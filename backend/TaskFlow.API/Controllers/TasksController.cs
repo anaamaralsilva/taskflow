@@ -52,8 +52,7 @@ public class TasksController : ControllerBase
             Priority = request.Priority,
             DueDate = request.DueDate,
             ProjectId = request.ProjectId,
-            Status = "Pending"
-        };
+            Status = request.Status        };
 
         _context.Tasks.Add(task);
         await _context.SaveChangesAsync();
