@@ -24,7 +24,7 @@ function ForgotPassword() {
 
     const data = await response.json();
 
-    alert(data.message);
+    window.location.href = data.resetLink;
   } catch {
     alert("Erro ao conectar com o servidor.");
   }

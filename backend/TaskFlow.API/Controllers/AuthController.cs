@@ -141,11 +141,14 @@ user.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
 
 await _context.SaveChangesAsync();
 
-    return Ok(new
-    {
-        message = "Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha."
-    });
-}
+    var resetLink = $"http://localhost:5173/reset-password?token={user.PasswordResetToken}";
+
+return Ok(new
+{
+    message = "Link de recuperação gerado com sucesso.",
+    resetLink
+});
+}    
 [HttpPost("reset-password")]
 public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
 {
