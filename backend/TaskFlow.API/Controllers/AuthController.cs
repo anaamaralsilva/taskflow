@@ -17,10 +17,16 @@ public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
-    public AuthController(AppDbContext context, IConfiguration configuration)
+    private readonly TaskFlow.API.Services.EmailService _emailService;
+    
+    public AuthController(
+    AppDbContext context,
+    IConfiguration configuration,
+    TaskFlow.API.Services.EmailService emailService)
     {
         _context = context;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     [HttpPost("login")]
@@ -143,6 +149,20 @@ await _context.SaveChangesAsync();
 
     var resetLink = $"http://localhost:5173/reset-password?token={user.PasswordResetToken}";
 
+await _emailService.SendEmailAsync(
+    user.Email,
+    "Redefinição de senha - TaskFlow",
+    $@"
+        <h2>Redefinição de senha</h2>
+        <p>Olá, {user.Name}!</p>
+        <p>Recebemos uma solicitação para redefinir sua senha no TaskFlow.</p>
+        <p>
+            <a href=""{resetLink}"">Clique aqui para redefinir sua senha</a>
+        </p>
+        <p>Este link expira em 30 minutos.</p>
+        <p>Se você não solicitou essa alteração, ignore este e-mail.</p>
+    "
+);
 return Ok(new
 {
     message = "Link de recuperação gerado com sucesso.",
