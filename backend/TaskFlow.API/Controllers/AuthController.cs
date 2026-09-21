@@ -141,13 +141,15 @@ public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
         });
     }
 
-user.PasswordResetToken = Guid.NewGuid().ToString();
+var resetToken = Guid.NewGuid().ToString();
+
+user.PasswordResetToken = BCrypt.Net.BCrypt.HashPassword(resetToken);
 
 user.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
 
 await _context.SaveChangesAsync();
 
-    var resetLink = $"http://localhost:5173/reset-password?token={user.PasswordResetToken}";
+    var resetLink = $"http://localhost:5173/reset-password?token={resetToken}";
 
 await _emailService.SendEmailAsync(
     user.Email,
@@ -172,8 +174,13 @@ return Ok(new
 [HttpPost("reset-password")]
 public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
 {
-    var user = await _context.Users
-        .FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
+    var usersWithResetToken = await _context.Users
+    .Where(u => u.PasswordResetToken != null)
+    .ToListAsync();
+
+var user = usersWithResetToken.FirstOrDefault(u =>
+    BCrypt.Net.BCrypt.Verify(request.Token, u.PasswordResetToken!)
+);
 
     if (user is null ||
         user.PasswordResetTokenExpiresAt is null ||

@@ -21,10 +21,14 @@ function ForgotPassword() {
         body: JSON.stringify({ email }),
       }
     );
+    
+    if (!response.ok) {
+      alert("Não foi possível enviar o e-mail de recuperação.");
+      return;
+    }
 
-    const data = await response.json();
-
-    window.location.href = data.resetLink;
+    alert("Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada.");
+    navigate("/");
   } catch {
     alert("Erro ao conectar com o servidor.");
   }
