@@ -178,9 +178,10 @@ public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
     .Where(u => u.PasswordResetToken != null)
     .ToListAsync();
 
-var user = usersWithResetToken.FirstOrDefault(u =>
-    BCrypt.Net.BCrypt.Verify(request.Token, u.PasswordResetToken!)
-);
+    var user = usersWithResetToken.FirstOrDefault(u =>
+        u.PasswordResetToken!.StartsWith("$2") &&
+        BCrypt.Net.BCrypt.Verify(request.Token, u.PasswordResetToken)
+    );
 
     if (user is null ||
         user.PasswordResetTokenExpiresAt is null ||
