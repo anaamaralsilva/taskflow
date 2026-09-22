@@ -167,9 +167,9 @@ await _emailService.SendEmailAsync(
 );
 return Ok(new
 {
-    message = "Link de recuperação gerado com sucesso.",
-    resetLink
+    message = "Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha."
 });
+
 }    
 [HttpPost("reset-password")]
 public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
