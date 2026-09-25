@@ -33,11 +33,11 @@ function Register() {
       }),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      alert(data.message || "Não foi possível realizar o cadastro.");
-      return;
+    alert(
+      "Não foi possível realizar o cadastro.\n\nA senha deve ter no mínimo 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial."
+     );
+     return;
     }
 
     alert("Cadastro realizado com sucesso!");
