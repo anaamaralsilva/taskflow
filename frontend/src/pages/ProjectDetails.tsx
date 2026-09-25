@@ -6,6 +6,7 @@ function ProjectDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState<any>(null);
+  const [projectStatus, setProjectStatus] = useState("");
   const [tasks, setTasks] = useState<any[]>([]);
   const [showTaskForm, setShowTaskForm] = useState(false);
 
@@ -43,6 +44,7 @@ if (!response.ok) {
 
       const data = await response.json();
       setProject(data);
+      setProjectStatus(data.status);
       const tasksResponse = await fetch(
   "http://localhost:5025/api/tasks",
   {
@@ -237,10 +239,62 @@ const handleUpdateTask = async () => {
     console.error(error);
   }
 };
+const handleUpdateProjectStatus = async (newStatus: string) => {
+  if (!project) {
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `http://localhost:5025/api/projects/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+         name: project.name,
+         description: project.description,
+         status: newStatus,
+         startDate: project.startDate,
+         dueDate: project.dueDate,
+        }),
+      }
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/");
+      return;
+    }
+
+    if (!response.ok) {
+      alert("Não foi possível atualizar o status do projeto.");
+      return;
+    }
+
+    const updatedProject = await response.json();
+
+    setProject(updatedProject);
+    setProjectStatus(updatedProject.status);
+  } catch (error) {
+    console.error(error);
+    alert("Não foi possível conectar ao servidor.");
+  }
+};
 
  return (
   <div className="project-details-page">
     <div className="project-details-container">
+
+    <div className="project-page-heading">
+     <span className="section-label">PROJETO</span>
+     <h1>Detalhes do projeto</h1>
+     <p>Gerencie as informações e tarefas do seu projeto.</p>
+  </div>
       <button
   className="back-button"
   onClick={() => navigate("/dashboard")}
@@ -251,15 +305,40 @@ const handleUpdateTask = async () => {
       {project ? (
         <>
           <div className="project-details-header">
+            <div className="project-title-area">
+            <span className="project-card-label">PROJETO ATUAL</span>
             <h1>{project.name}</h1>
             <p>{project.description}</p>
-            <p>Status: {project.status}</p>
+          </div>
+            <div className="project-status-control">
+  <span>Status:</span>
+
+  <select
+    value={projectStatus}
+    onChange={(e) => {
+      const newStatus = e.target.value;
+      setProjectStatus(newStatus);
+      handleUpdateProjectStatus(newStatus);
+    }}
+  >
+    <option value="Active">Ativo</option>
+    <option value="In Progress">Em andamento</option>
+    <option value="Completed">Concluído</option>
+  </select>
+</div>
             <p>
-              Início: {new Date(project.startDate).toLocaleDateString("pt-BR")}
-            </p>
-            <p>
-              Prazo: {new Date(project.dueDate).toLocaleDateString("pt-BR")}
-            </p>
+  Início:{" "}
+  {project.startDate && !project.startDate.startsWith("0001-")
+    ? new Date(project.startDate).toLocaleDateString("pt-BR")
+    : "Não definido"}
+</p>
+
+<p>
+  Prazo:{" "}
+  {project.dueDate && !project.dueDate.startsWith("0001-")
+    ? new Date(project.dueDate).toLocaleDateString("pt-BR")
+    : "Não definido"}
+</p>
           </div>
 
           <div className="tasks-section">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./Register.css";
 
 function Register() {
   const navigate = useNavigate();
@@ -48,44 +49,107 @@ function Register() {
 };
 
  return (
-  <div>
-    <h1>Cadastre-se</h1>
+  <div className="register-page">
+    <div className="register-container">
 
-    <input
-      type="text"
-      placeholder="Nome"
-      value={name}
-      onChange={(e) => setName(e.target.value)}
-    />
+      <div className="register-brand">
+        <div className="register-brand-content">
+          <span className="register-brand-badge">TASKFLOW</span>
 
-    <input
-      type="email"
-      placeholder="E-mail"
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-    />
+          <h1>
+            Comece a organizar
+            <br />
+            seus projetos.
+          </h1>
 
-    <input
-      type="password"
-      placeholder="Senha"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-    />
+          <p>
+            Crie sua conta e transforme suas ideias em tarefas,
+            projetos e resultados.
+          </p>
+        </div>
+      </div>
 
-    <input
-      type="password"
-      placeholder="Confirmar senha"
-      value={confirmPassword}
-      onChange={(e) => setConfirmPassword(e.target.value)}
-    />
+      <div className="register-form-section">
+        <div className="register-card">
 
-    <button onClick={handleRegister}>
-      Cadastrar
-    </button>
+          <div className="register-header">
+            <h2>Crie sua conta</h2>
+            <p>Preencha seus dados para começar.</p>
+          </div>
 
-    <button onClick={() => navigate("/")}>
-      Já tenho uma conta
-    </button>
+          <div className="register-form-group">
+            <label htmlFor="name">Nome</label>
+            <input
+              id="name"
+              type="text"
+              placeholder="Seu nome"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div className="register-form-group">
+            <label htmlFor="email">E-mail</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="register-form-group">
+            <label htmlFor="password">Senha</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Crie uma senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <div className="register-form-group">
+            <label htmlFor="confirmPassword">Confirmar senha</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              placeholder="Digite a senha novamente"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
+
+          <p className="password-hint">
+            Use no mínimo 8 caracteres, com letra maiúscula, minúscula,
+            número e caractere especial.
+          </p>
+
+          <button
+            className="register-submit-button"
+            type="button"
+            onClick={handleRegister}
+          >
+            Criar conta
+          </button>
+
+          <div className="register-login-area">
+            <span>Já possui uma conta?</span>
+
+            <button
+              className="register-login-button"
+              type="button"
+              onClick={() => navigate("/")}
+            >
+              Entrar
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
   </div>
 );
 }

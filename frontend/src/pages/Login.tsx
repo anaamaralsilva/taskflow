@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -41,35 +42,90 @@ function Login() {
 };
 
   return (
-    <div>
-      <h1>TaskFlow</h1>
-      <h2>Login</h2>
+  <div className="login-page">
+    <div className="login-container">
 
-      <input
-        type="email"
-        placeholder="E-mail"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <div className="login-brand">
+        <div className="brand-content">
+          <span className="brand-badge">TASKFLOW</span>
 
-      <input
-        type="password"
-        placeholder="Senha"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+          <h1>
+            Organize seu trabalho.
+            <br />
+            Alcance seus objetivos.
+          </h1>
 
-      <button onClick={handleLogin}>Entrar</button>
+          <p>
+            Gerencie projetos e tarefas em um único lugar,
+            de forma simples e eficiente.
+          </p>
+        </div>
+      </div>
 
-      <button onClick={() => navigate("/register")}>
-        Cadastre-se
-      </button>
+      <div className="login-form-section">
+        <div className="login-card">
 
-      <button onClick={() => navigate("/forgot-password")}>
-        Esqueci minha senha
-      </button>
+          <div className="login-header">
+            <h2>Bem-vindo de volta</h2>
+            <p>Entre na sua conta para continuar.</p>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="email">E-mail</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Senha</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Digite sua senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <button
+            className="forgot-password-button"
+            type="button"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Esqueci minha senha
+          </button>
+
+          <button
+            className="login-button"
+            type="button"
+            onClick={handleLogin}
+          >
+            Entrar
+          </button>
+
+          <div className="register-area">
+            <span>Ainda não possui uma conta?</span>
+
+            <button
+              className="register-button"
+              type="button"
+              onClick={() => navigate("/register")}
+            >
+              Criar conta
+            </button>
+          </div>
+
+        </div>
+      </div>
+
     </div>
-  );
+  </div>
+);
 }
 
 export default Login;

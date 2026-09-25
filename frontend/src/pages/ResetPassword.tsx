@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import "./ResetPassword.css";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -55,32 +56,89 @@ function ResetPassword() {
 };
 
   return (
-    <div>
-      <h1>Redefinir senha</h1>
+  <div className="reset-page">
+    <div className="reset-container">
 
-      <input
-        type="password"
-        placeholder="Nova senha"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
+      <div className="reset-brand">
+        <div className="reset-brand-content">
+          <span className="reset-brand-badge">TASKFLOW</span>
 
-      <input
-        type="password"
-        placeholder="Confirmar nova senha"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-      />
+          <h1>
+            Crie uma nova
+            <br />
+            senha segura.
+          </h1>
 
-      <button onClick={handleResetPassword}>
-        Redefinir senha
-      </button>
+          <p>
+            Escolha uma nova senha para recuperar o acesso
+            à sua conta e continuar seus projetos.
+          </p>
+        </div>
+      </div>
 
-      <button onClick={() => navigate("/")}>
-        Voltar para o Login
-      </button>
+      <div className="reset-form-section">
+        <div className="reset-card">
+
+          <div className="reset-header">
+            <h2>Redefinir senha</h2>
+            <p>Digite e confirme sua nova senha.</p>
+          </div>
+
+          <div className="reset-form-group">
+            <label htmlFor="newPassword">Nova senha</label>
+
+            <input
+              id="newPassword"
+              type="password"
+              placeholder="Digite sua nova senha"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
+
+          <div className="reset-form-group">
+            <label htmlFor="confirmPassword">Confirmar nova senha</label>
+
+            <input
+              id="confirmPassword"
+              type="password"
+              placeholder="Digite a senha novamente"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
+
+          <p className="reset-password-hint">
+            Use no mínimo 8 caracteres, com letra maiúscula, minúscula,
+            número e caractere especial.
+          </p>
+
+          <button
+            className="reset-submit-button"
+            type="button"
+            onClick={handleResetPassword}
+          >
+            Redefinir senha
+          </button>
+
+          <div className="reset-login-area">
+            <span>Voltar para</span>
+
+            <button
+              className="reset-login-button"
+              type="button"
+              onClick={() => navigate("/")}
+            >
+              Login
+            </button>
+          </div>
+
+        </div>
+      </div>
+
     </div>
-  );
+  </div>
+);
 }
 
 export default ResetPassword;

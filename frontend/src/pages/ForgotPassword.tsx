@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./ForgotPassword.css";
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -42,27 +43,75 @@ if (!response.ok) {
 };
 
   return (
-    <div>
-      <h1>Esqueci minha senha</h1>
+  <div className="forgot-page">
+    <div className="forgot-container">
 
-      <p>Digite seu e-mail para recuperar sua senha.</p>
+      <div className="forgot-brand">
+        <div className="forgot-brand-content">
+          <span className="forgot-brand-badge">TASKFLOW</span>
 
-      <input
-        type="email"
-        placeholder="E-mail"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+          <h1>
+            Recupere o acesso
+            <br />
+            à sua conta.
+          </h1>
 
-      <button onClick={handleForgotPassword}>
-        Enviar
-      </button>
+          <p>
+            Informe seu e-mail e enviaremos as instruções
+            para você criar uma nova senha.
+          </p>
+        </div>
+      </div>
 
-      <button onClick={() => navigate("/")}>
-        Voltar para o Login
-      </button>
+      <div className="forgot-form-section">
+        <div className="forgot-card">
+
+          <div className="forgot-header">
+            <h2>Esqueceu sua senha?</h2>
+
+            <p>
+              Digite o e-mail cadastrado na sua conta.
+            </p>
+          </div>
+
+          <div className="forgot-form-group">
+            <label htmlFor="email">E-mail</label>
+
+            <input
+              id="email"
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <button
+            className="forgot-submit-button"
+            type="button"
+            onClick={handleForgotPassword}
+          >
+            Enviar link de recuperação
+          </button>
+
+          <div className="forgot-login-area">
+            <span>Lembrou sua senha?</span>
+
+            <button
+              className="forgot-login-button"
+              type="button"
+              onClick={() => navigate("/")}
+            >
+              Voltar para o login
+            </button>
+          </div>
+
+        </div>
+      </div>
+
     </div>
-  );
+  </div>
+);
 }
 
 export default ForgotPassword;
