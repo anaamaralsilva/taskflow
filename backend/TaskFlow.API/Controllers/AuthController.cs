@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace TaskFlow.API.Controllers;
 
@@ -30,6 +31,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
         var user = await _context.Users
@@ -128,6 +130,7 @@ public async Task<IActionResult> Register(RegisterUserRequest request)
 }
 
 [HttpPost("forgot-password")]
+[EnableRateLimiting("auth")]
 public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
 {
     var user = await _context.Users
