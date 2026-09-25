@@ -152,7 +152,9 @@ user.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
 
 await _context.SaveChangesAsync();
 
-    var resetLink = $"http://localhost:5173/reset-password?token={resetToken}";
+    var frontendBaseUrl = _configuration["Frontend:BaseUrl"];
+
+var resetLink = $"{frontendBaseUrl}/reset-password?token={resetToken}";
 
 await _emailService.SendEmailAsync(
     user.Email,

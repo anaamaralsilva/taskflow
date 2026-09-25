@@ -22,10 +22,17 @@ function ForgotPassword() {
       }
     );
     
-    if (!response.ok) {
-      alert("Não foi possível enviar o e-mail de recuperação.");
-      return;
-    }
+    if (response.status === 429) {
+      alert(
+    "Muitas solicitações de recuperação. Aguarde um minuto e tente novamente."
+  );
+  return;
+}
+
+if (!response.ok) {
+  alert("Não foi possível enviar o e-mail de recuperação.");
+  return;
+}
 
     alert("Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada.");
     navigate("/");

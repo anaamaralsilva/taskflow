@@ -19,10 +19,15 @@ function Login() {
       }),
     });
 
+    if (response.status === 429) {
+  alert("Muitas tentativas de login. Aguarde um minuto e tente novamente.");
+  return;
+}
+
     if (!response.ok) {
-      alert("E-mail ou senha inválidos.");
-      return;
-    }
+  alert("Email ou senha inválidos.");
+  return;
+}
 
     const data = await response.json();
 
