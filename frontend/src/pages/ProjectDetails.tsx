@@ -20,6 +20,12 @@ function ProjectDetails() {
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
   const [showDeleteProjectModal, setShowDeleteProjectModal] = useState(false);
+  
+  const [showEditProjectForm, setShowEditProjectForm] = useState(false);
+  const [editProjectName, setEditProjectName] = useState("");
+  const [editProjectDescription, setEditProjectDescription] = useState("");
+  const [editProjectStartDate, setEditProjectStartDate] = useState("");
+  const [editProjectDueDate, setEditProjectDueDate] = useState("");
 
   const [notification, setNotification] = useState<{
   message: string;
@@ -235,7 +241,89 @@ const handleDeleteTask = async (taskId: number) => {
     });
   }
 };
+const handleUpdateProject = async () => {
+  if (!project) {
+    return;
+  }
 
+  if (!editProjectName.trim()) {
+    setNotification({
+      message: "Digite o nome do projeto.",
+      type: "error",
+    });
+    return;
+  }
+
+  if (!editProjectStartDate || !editProjectDueDate) {
+    setNotification({
+      message: "Preencha a data de início e o prazo.",
+      type: "error",
+    });
+    return;
+  }
+
+  if (editProjectDueDate < editProjectStartDate) {
+    setNotification({
+      message: "O prazo não pode ser anterior à data de início.",
+      type: "error",
+    });
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `http://localhost:5025/api/projects/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: editProjectName.trim(),
+          description: editProjectDescription,
+          startDate: editProjectStartDate,
+          dueDate: editProjectDueDate,
+          status: projectStatus,
+        }),
+      }
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/");
+      return;
+    }
+
+    if (!response.ok) {
+      setNotification({
+        message: "Não foi possível atualizar o projeto.",
+        type: "error",
+      });
+      return;
+    }
+
+    const updatedProject = await response.json();
+
+    setProject(updatedProject);
+    setProjectStatus(updatedProject.status);
+    setShowEditProjectForm(false);
+
+    setNotification({
+      message: "Projeto atualizado com sucesso!",
+      type: "success",
+    });
+  } catch (error) {
+    console.error(error);
+
+    setNotification({
+      message: "Não foi possível conectar ao servidor.",
+      type: "error",
+    });
+  }
+};
 
 const handleEditTask = (task: any) => {
   setEditingTaskId(task.id);
@@ -475,7 +563,28 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
              <span className="project-card-label">PROJETO ATUAL</span>
              <h1>{project.name}</h1>
              <p>{project.description}</p>
-
+            
+            <button
+  type="button"
+  className="edit-project-button"
+  onClick={() => {
+    setEditProjectName(project.name);
+    setEditProjectDescription(project.description);
+    setEditProjectStartDate(
+      project.startDate && !project.startDate.startsWith("0001-")
+        ? project.startDate.split("T")[0]
+        : ""
+    );
+    setEditProjectDueDate(
+      project.dueDate && !project.dueDate.startsWith("0001-")
+        ? project.dueDate.split("T")[0]
+        : ""
+    );
+    setShowEditProjectForm(true);
+  }}
+>
+  Editar projeto
+</button>
             <button
               type="button"
               className="delete-project-button"
@@ -483,6 +592,58 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
             >
                Excluir projeto
              </button>
+             {showEditProjectForm && (
+  <div className="edit-project-form">
+    <label>Nome do projeto</label>
+    <input
+      type="text"
+      value={editProjectName}
+      onChange={(e) => setEditProjectName(e.target.value)}
+    />
+
+    <label>Descrição</label>
+    <textarea
+      value={editProjectDescription}
+      onChange={(e) => setEditProjectDescription(e.target.value)}
+    />
+
+    <div className="edit-project-dates">
+      <div>
+        <label>Data de início</label>
+        <input
+          type="date"
+          value={editProjectStartDate}
+          onChange={(e) => setEditProjectStartDate(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label>Prazo</label>
+        <input
+          type="date"
+          value={editProjectDueDate}
+          onChange={(e) => setEditProjectDueDate(e.target.value)}
+        />
+      </div>
+    </div>
+
+    <div className="edit-project-actions">
+      <button
+        type="button"
+        onClick={() => setShowEditProjectForm(false)}
+      >
+        Cancelar
+      </button>
+
+      <button
+       type="button"
+       onClick={handleUpdateProject}
+      >
+       Salvar alterações
+     </button>
+    </div>
+  </div>
+)}
             </div>
             <div className="project-info-grid">
 
