@@ -13,7 +13,24 @@ function Dashboard() {
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDescription, setNewProjectDescription] = useState("");
   const [newProjectStartDate, setNewProjectStartDate] = useState("");
-const [newProjectDueDate, setNewProjectDueDate] = useState("");
+  const [newProjectDueDate, setNewProjectDueDate] = useState("");
+
+  const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error";
+} | null>(null);
+
+  useEffect(() => {
+  if (!notification) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+
+  return () => clearTimeout(timer);
+}, [notification]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -22,17 +39,26 @@ const [newProjectDueDate, setNewProjectDueDate] = useState("");
 
   const handleCreateProject = async () => {
   if (!newProjectName.trim()) {
-    alert("Digite o nome do projeto.");
+    setNotification({
+      message: "Digite o nome do projeto.",
+      type: "error",
+    });
     return;
   }
 
   if (!newProjectStartDate || !newProjectDueDate) {
-  alert("Preencha a data de início e o prazo.");
+  setNotification({
+  message: "Preencha a data de início e o prazo.",
+  type: "error",
+});
   return;
 }
 
 if (newProjectDueDate < newProjectStartDate) {
-  alert("O prazo não pode ser anterior à data de início.");
+  setNotification({
+  message: "O prazo não pode ser anterior à data de início.",
+  type: "error",
+});
   return;
 }
 
@@ -61,7 +87,10 @@ if (newProjectDueDate < newProjectStartDate) {
     }
 
     if (!response.ok) {
-      alert("Não foi possível criar o projeto.");
+      setNotification({
+      message: "Não foi possível criar o projeto.",
+      type: "error",
+     });
       return;
     }
 
@@ -80,10 +109,16 @@ if (newProjectDueDate < newProjectStartDate) {
     setNewProjectDueDate("");
     setShowProjectForm(false);
 
-    alert("Projeto criado com sucesso!");
+    setNotification({
+    message: "Projeto criado com sucesso!",
+    type: "success",
+  });
   } catch (error) {
     console.error(error);
-    alert("Não foi possível conectar ao servidor.");
+    setNotification({
+    message: "Não foi possível conectar ao servidor.",
+    type: "error",
+  });
   }
 };
 
@@ -148,6 +183,19 @@ setCompletedTasksCount(completedTasks.length);
 
 return (
   <div className="dashboard-page">
+
+    {notification && (
+  <div className={`notification-toast ${notification.type}`}>
+    <span>{notification.message}</span>
+
+    <button
+      type="button"
+      onClick={() => setNotification(null)}
+    >
+      ×
+    </button>
+  </div>
+)}
 
     {showProjectForm && (
   <div className="project-modal-overlay">

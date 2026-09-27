@@ -17,6 +17,26 @@ function ProjectDetails() {
   const [taskDueDate, setTaskDueDate] = useState("");
   const [taskError, setTaskError] = useState("");
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+
+  const [showDeleteProjectModal, setShowDeleteProjectModal] = useState(false);
+
+  const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error";
+} | null>(null);
+
+  useEffect(() => {
+  if (!notification) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+
+  return () => clearTimeout(timer);
+}, [notification]);
 
   useEffect(() => {
   const loadProject = async () => {
@@ -122,18 +142,18 @@ if (!response.ok) {
     setTaskStatus("Pending");
     setTaskDueDate("");
     setShowTaskForm(false);
+
+    setNotification({
+  message: "Tarefa criada com sucesso!",
+  type: "success",
+});
+
   } catch (error) {
     console.error(error);
   }
 };
 const handleDeleteTask = async (taskId: number) => {
-  const confirmed = window.confirm(
-  "Tem certeza que deseja excluir esta tarefa?"
-);
-
-if (!confirmed) {
-  return;
-}
+  
   const token = localStorage.getItem("token");
 
   try {
@@ -161,10 +181,61 @@ if (!confirmed) {
     setTasks((currentTasks) =>
       currentTasks.filter((task) => task.id !== taskId)
     );
+
+    setNotification({
+    message: "Tarefa excluída com sucesso!",
+    type: "success",
+  });
+
+  } catch (error) {
+  console.error(error);
+
+  setNotification({
+    message: "Não foi possível conectar ao servidor.",
+    type: "error",
+  });
+}
+};
+
+  const handleDeleteProject = async () => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `http://localhost:5025/api/projects/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/");
+      return;
+    }
+
+    if (!response.ok) {
+      setNotification({
+        message: "Não foi possível excluir o projeto.",
+        type: "error",
+      });
+      return;
+    }
+
+    navigate("/dashboard");
   } catch (error) {
     console.error(error);
+
+    setNotification({
+      message: "Não foi possível conectar ao servidor.",
+      type: "error",
+    });
   }
 };
+
 
 const handleEditTask = (task: any) => {
   setEditingTaskId(task.id);
@@ -232,9 +303,15 @@ const handleUpdateTask = async () => {
     setTaskTitle("");
     setTaskDescription("");
     setTaskPriority("Medium");
+    setTaskStatus("Pending");
     setTaskDueDate("");
     setEditingTaskId(null);
     setShowTaskForm(false);
+
+    setNotification({
+     message: "Tarefa atualizada com sucesso!",
+     type: "success",
+    });
   } catch (error) {
     console.error(error);
   }
@@ -272,7 +349,10 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
     }
 
     if (!response.ok) {
-      alert("Não foi possível atualizar o status do projeto.");
+      setNotification({
+        message: "Não foi possível atualizar o status do projeto.",
+        type: "error",
+       });
       return;
     }
 
@@ -282,12 +362,98 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
     setProjectStatus(updatedProject.status);
   } catch (error) {
     console.error(error);
-    alert("Não foi possível conectar ao servidor.");
+    setNotification({
+      message: "Não foi possível conectar ao servidor.",
+      type: "error",
+     });
   }
 };
 
  return (
   <div className="project-details-page">
+    {notification && (
+  <div className={`notification-toast ${notification.type}`}>
+    <span>{notification.message}</span>
+
+    <button
+      type="button"
+      onClick={() => setNotification(null)}
+    >
+      ×
+    </button>
+  </div>
+)}
+    {taskToDelete !== null && (
+  <div className="delete-modal-overlay">
+    <div className="delete-modal">
+      <div className="delete-modal-icon">!</div>
+
+      <h2>Excluir tarefa?</h2>
+
+      <p>
+        Tem certeza de que deseja excluir esta tarefa?
+        Esta ação não poderá ser desfeita.
+      </p>
+
+      <div className="delete-modal-actions">
+        <button
+          type="button"
+          className="delete-modal-cancel"
+          onClick={() => setTaskToDelete(null)}
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          className="delete-modal-confirm"
+          onClick={async () => {
+            await handleDeleteTask(taskToDelete);
+            setTaskToDelete(null);
+          }}
+        >
+          Excluir tarefa
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showDeleteProjectModal && (
+  <div className="delete-modal-overlay">
+    <div className="delete-modal">
+      <div className="delete-modal-icon">!</div>
+
+      <h2>Excluir projeto?</h2>
+
+      <p>
+        Tem certeza de que deseja excluir este projeto?
+        Esta ação não poderá ser desfeita.
+      </p>
+
+      <div className="delete-modal-actions">
+        <button
+          type="button"
+          className="delete-modal-cancel"
+          onClick={() => setShowDeleteProjectModal(false)}
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          className="delete-modal-confirm"
+          onClick={async () => {
+            await handleDeleteProject();
+            setShowDeleteProjectModal(false);
+          }}
+        >
+          Excluir projeto
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     <div className="project-details-container">
 
     <div className="project-page-heading">
@@ -306,39 +472,56 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
         <>
           <div className="project-details-header">
             <div className="project-title-area">
-            <span className="project-card-label">PROJETO ATUAL</span>
-            <h1>{project.name}</h1>
-            <p>{project.description}</p>
-          </div>
-            <div className="project-status-control">
-  <span>Status:</span>
+             <span className="project-card-label">PROJETO ATUAL</span>
+             <h1>{project.name}</h1>
+             <p>{project.description}</p>
 
-  <select
-    value={projectStatus}
-    onChange={(e) => {
-      const newStatus = e.target.value;
-      setProjectStatus(newStatus);
-      handleUpdateProjectStatus(newStatus);
-    }}
-  >
-    <option value="Active">Ativo</option>
-    <option value="In Progress">Em andamento</option>
-    <option value="Completed">Concluído</option>
-  </select>
+            <button
+              type="button"
+              className="delete-project-button"
+              onClick={() => setShowDeleteProjectModal(true)}
+            >
+               Excluir projeto
+             </button>
+            </div>
+            <div className="project-info-grid">
+
+  <div className="project-info-card">
+    <span className="project-info-label">STATUS</span>
+
+    <select
+      value={projectStatus}
+      onChange={(e) => {
+        const newStatus = e.target.value;
+        setProjectStatus(newStatus);
+        handleUpdateProjectStatus(newStatus);
+      }}
+    >
+      <option value="Active">Ativo</option>
+      <option value="In Progress">Em andamento</option>
+      <option value="Completed">Concluído</option>
+    </select>
+  </div>
+
+  <div className="project-info-card">
+    <span className="project-info-label">DATA DE INÍCIO</span>
+    <strong>
+      {project.startDate && !project.startDate.startsWith("0001-")
+        ? new Date(project.startDate).toLocaleDateString("pt-BR")
+        : "Não definido"}
+    </strong>
+  </div>
+
+  <div className="project-info-card">
+    <span className="project-info-label">PRAZO</span>
+    <strong>
+      {project.dueDate && !project.dueDate.startsWith("0001-")
+        ? new Date(project.dueDate).toLocaleDateString("pt-BR")
+        : "Não definido"}
+    </strong>
+  </div>
+
 </div>
-            <p>
-  Início:{" "}
-  {project.startDate && !project.startDate.startsWith("0001-")
-    ? new Date(project.startDate).toLocaleDateString("pt-BR")
-    : "Não definido"}
-</p>
-
-<p>
-  Prazo:{" "}
-  {project.dueDate && !project.dueDate.startsWith("0001-")
-    ? new Date(project.dueDate).toLocaleDateString("pt-BR")
-    : "Não definido"}
-</p>
           </div>
 
           <div className="tasks-section">
@@ -347,7 +530,16 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
 
               <button
                  className="new-task-button"
-                 onClick={() => setShowTaskForm(true)}
+                 onClick={() => {
+                   setEditingTaskId(null);
+                   setTaskTitle("");
+                   setTaskDescription("");
+                   setTaskPriority("Medium");
+                   setTaskStatus("Pending");
+                   setTaskDueDate("");
+                   setTaskError("");
+                   setShowTaskForm(true);
+                  }}
                 >
                   + Nova Tarefa
                 </button>
@@ -359,6 +551,8 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
   <p className="task-error">{taskError}</p>
 )}
 
+<label>Título</label>
+
     <input
       type="text"
       placeholder="Título da tarefa"
@@ -366,11 +560,15 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
       onChange={(e) => setTaskTitle(e.target.value)}
     />
 
+    <label>Descrição</label>
+
     <textarea
       placeholder="Descrição"
       value={taskDescription}
       onChange={(e) => setTaskDescription(e.target.value)}
     />
+
+    <label>Prioridade</label>
 
     <select
       value={taskPriority}
@@ -381,6 +579,8 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
       <option value="High">Alta</option>
     </select>
 
+    <label>Status</label>
+
     <select
   value={taskStatus}
   onChange={(e) => setTaskStatus(e.target.value)}
@@ -389,6 +589,8 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
   <option value="In Progress">Em andamento</option>
   <option value="Completed">Concluída</option>
 </select>
+
+<label>Prazo</label>
 
     <input
       type="date"
@@ -415,8 +617,27 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
                   <div className="task-card" key={task.id}>
                     <h3>{task.title}</h3>
                     <p>{task.description}</p>
-                    <p>Status: {task.status}</p>
-                    <p>Prioridade: {task.priority}</p>
+                    <p>
+  Status:{" "}
+  {task.status === "Pending"
+    ? "Pendente"
+    : task.status === "In Progress"
+    ? "Em andamento"
+    : task.status === "Completed"
+    ? "Concluída"
+    : task.status}
+</p>
+
+<p>
+  Prioridade:{" "}
+  {task.priority === "Low"
+    ? "Baixa"
+    : task.priority === "Medium"
+    ? "Média"
+    : task.priority === "High"
+    ? "Alta"
+    : task.priority}
+</p>
                     <p>
                       Prazo:{" "}
                       {new Date(task.dueDate).toLocaleDateString("pt-BR")}
@@ -431,7 +652,7 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
                     
                     <button
                      className="delete-task-button"
-                     onClick={() => handleDeleteTask(task.id)}
+                     onClick={() => setTaskToDelete(task.id)}
                    >
                     Excluir
                   </button>
