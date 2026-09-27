@@ -27,6 +27,10 @@ function ProjectDetails() {
   const [editProjectStartDate, setEditProjectStartDate] = useState("");
   const [editProjectDueDate, setEditProjectDueDate] = useState("");
 
+  const [taskFilter, setTaskFilter] = useState<
+  "All" | "Pending" | "In Progress" | "Completed"
+>("All");
+
   const [notification, setNotification] = useState<{
   message: string;
   type: "success" | "error";
@@ -705,6 +709,50 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
                   + Nova Tarefa
                 </button>
             </div>
+
+            <div className="task-filters">
+  <button
+    type="button"
+    className={taskFilter === "All" ? "active" : ""}
+    onClick={() => setTaskFilter("All")}
+  >
+    Todas <span>{tasks.length}</span>
+  </button>
+
+  <button
+    type="button"
+    className={taskFilter === "Pending" ? "active" : ""}
+    onClick={() => setTaskFilter("Pending")}
+  >
+    Pendentes{" "}
+    <span>
+      {tasks.filter((task) => task.status === "Pending").length}
+    </span>
+  </button>
+
+  <button
+    type="button"
+    className={taskFilter === "In Progress" ? "active" : ""}
+    onClick={() => setTaskFilter("In Progress")}
+  >
+    Em andamento{" "}
+    <span>
+      {tasks.filter((task) => task.status === "In Progress").length}
+    </span>
+  </button>
+
+  <button
+    type="button"
+    className={taskFilter === "Completed" ? "active" : ""}
+    onClick={() => setTaskFilter("Completed")}
+  >
+    Concluídas{" "}
+   <span>
+    {tasks.filter((task) => task.status === "Completed").length}
+   </span>
+  </button>
+</div>
+
              {showTaskForm && (
   <div className="task-form">
 
@@ -774,35 +822,73 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
 )}
             {tasks.length > 0 ? (
               <div>
-                {tasks.map((task) => (
-                  <div className="task-card" key={task.id}>
+
+                {tasks.filter((task) =>
+                  taskFilter === "All" ? true : task.status === taskFilter
+                ).length === 0 && (
+                  <div className="empty-tasks">
+                    <p>Nenhuma tarefa encontrada neste filtro.</p>
+                    <span>
+                      As tarefas com esse status aparecerão aqui.
+                    </span>
+                  </div>
+                 )}
+                {tasks
+                  .filter((task) =>
+                  taskFilter === "All" ? true : task.status === taskFilter
+                   )
+                  .map((task) => (
+                  <div
+                     className={`task-card ${
+                        task.status === "Completed" ? "task-card-completed" : ""
+                      }`}
+                      key={task.id}
+                      >
                     <h3>{task.title}</h3>
                     <p>{task.description}</p>
-                    <p>
-  Status:{" "}
-  {task.status === "Pending"
-    ? "Pendente"
-    : task.status === "In Progress"
-    ? "Em andamento"
-    : task.status === "Completed"
-    ? "Concluída"
-    : task.status}
-</p>
+<div className="task-meta">
+  <div className="task-meta-item">
+    <span className="task-meta-label">STATUS</span>
 
-<p>
-  Prioridade:{" "}
-  {task.priority === "Low"
-    ? "Baixa"
-    : task.priority === "Medium"
-    ? "Média"
-    : task.priority === "High"
-    ? "Alta"
-    : task.priority}
-</p>
-                    <p>
-                      Prazo:{" "}
-                      {new Date(task.dueDate).toLocaleDateString("pt-BR")}
-                    </p>
+    <span
+      className={`task-badge status-${task.status
+        .toLowerCase()
+        .replaceAll(" ", "-")}`}
+    >
+      {task.status === "Pending"
+        ? "Pendente"
+        : task.status === "In Progress"
+        ? "Em andamento"
+        : task.status === "Completed"
+        ? "Concluída"
+        : task.status}
+    </span>
+  </div>
+
+  <div className="task-meta-item">
+    <span className="task-meta-label">PRIORIDADE</span>
+
+    <span
+      className={`task-badge priority-${task.priority.toLowerCase()}`}
+    >
+      {task.priority === "Low"
+        ? "Baixa"
+        : task.priority === "Medium"
+        ? "Média"
+        : task.priority === "High"
+        ? "Alta"
+        : task.priority}
+    </span>
+  </div>
+
+  <div className="task-meta-item">
+    <span className="task-meta-label">PRAZO</span>
+
+    <strong>
+      {new Date(task.dueDate).toLocaleDateString("pt-BR")}
+    </strong>
+  </div>
+</div>
 
                     <button
                      className="edit-task-button"
