@@ -36,6 +36,15 @@ function ProjectDetails() {
   type: "success" | "error";
 } | null>(null);
 
+   const completedTasks = tasks.filter(
+     (task) => task.status === "Completed"
+   ).length;
+
+   const progress =
+     tasks.length > 0
+       ? Math.round((completedTasks / tasks.length) * 100)
+       : 0;
+
   useEffect(() => {
   if (!notification) {
     return;
@@ -686,6 +695,26 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
     </strong>
   </div>
 
+</div>
+<div className="project-progress">
+  <div className="project-progress-header">
+    <div>
+      <span className="project-progress-label">PROGRESSO DO PROJETO</span>
+      <p>
+        {completedTasks} de {tasks.length}{" "}
+        {tasks.length === 1 ? "tarefa concluída" : "tarefas concluídas"}
+      </p>
+    </div>
+
+    <strong>{progress}%</strong>
+  </div>
+
+  <div className="project-progress-bar">
+    <div
+      className="project-progress-fill"
+      style={{ width: `${progress}%` }}
+    />
+  </div>
 </div>
           </div>
 
