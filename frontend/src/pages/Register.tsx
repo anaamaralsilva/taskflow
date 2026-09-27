@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
 
@@ -9,15 +9,39 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error";
+} | null>(null);
+  
+    useEffect(() => {
+  if (!notification) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+
+  return () => clearTimeout(timer);
+}, [notification]);
+
+  
 
   const handleRegister = async () => {
   if (!name.trim() || !email.trim() || !password || !confirmPassword) {
-    alert("Preencha todos os campos.");
+    setNotification({
+     message: "Preencha todos os campos.",
+     type: "error",
+    });
     return;
   }
 
   if (password !== confirmPassword) {
-    alert("As senhas não coincidem.");
+    setNotification({
+     message: "As senhas não coincidem.",
+     type: "error",
+    });
     return;
   }
 
@@ -35,21 +59,41 @@ function Register() {
     });
 
     if (!response.ok) {
-    alert(
-      "Não foi possível realizar o cadastro.\n\nA senha deve ter no mínimo 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial."
-     );
+    setNotification({
+      message:
+      "Não foi possível realizar o cadastro. A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial.",
+      type: "error",
+     });
      return;
     }
 
-    alert("Cadastro realizado com sucesso!");
+    setNotification({
+      message: "Cadastro realizado com sucesso!",
+      type: "success",
+    });
     navigate("/");
   } catch {
-    alert("Erro ao conectar com o servidor.");
+    setNotification({
+      message: "Erro ao conectar com o servidor.",
+      type: "error",
+    });
   }
 };
 
  return (
   <div className="register-page">
+    {notification && (
+  <div className={`notification-toast ${notification.type}`}>
+    <span>{notification.message}</span>
+
+    <button
+      type="button"
+      onClick={() => setNotification(null)}
+    >
+      ×
+    </button>
+  </div>
+)}
     <div className="register-container">
 
       <div className="register-brand">

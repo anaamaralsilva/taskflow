@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
@@ -6,6 +6,23 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  useEffect(() => {
+  if (!notification) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+
+  return () => clearTimeout(timer);
+}, [notification]);
 
   const handleLogin = async () => {
   try {
@@ -21,12 +38,18 @@ function Login() {
     });
 
     if (response.status === 429) {
-  alert("Muitas tentativas de login. Aguarde um minuto e tente novamente.");
+  setNotification({
+   message: "Muitas tentativas de login. Aguarde um minuto e tente novamente.",
+   type: "error",
+  });
   return;
 }
 
     if (!response.ok) {
-  alert("Email ou senha inválidos.");
+  setNotification({
+   message: "Email ou senha inválidos.",
+   type: "error",
+  });
   return;
 }
 
@@ -37,12 +60,28 @@ function Login() {
    navigate("/dashboard");
   } catch (error) {
     console.error(error);
-    alert("Não foi possível conectar ao servidor.");
+    setNotification({
+     message: "Não foi possível conectar ao servidor.",
+     type: "error",
+    });
   }
 };
 
   return (
   <div className="login-page">
+
+    {notification && (
+  <div className={`notification-toast ${notification.type}`}>
+    <span>{notification.message}</span>
+
+    <button
+      type="button"
+      onClick={() => setNotification(null)}
+    >
+      ×
+    </button>
+  </div>
+)}
     <div className="login-container">
 
       <div className="login-brand">

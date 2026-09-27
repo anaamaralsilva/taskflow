@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ForgotPassword.css";
 
 function ForgotPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
+
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  useEffect(() => {
+  if (!notification) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+
+  return () => clearTimeout(timer);
+}, [notification]);
+
   const handleForgotPassword = async () => {
   if (!email.trim()) {
-    alert("Digite seu e-mail.");
+    setNotification({
+      message: "Digite seu e-mail.",
+      type: "error",
+    });
     return;
   }
 
@@ -24,26 +45,50 @@ function ForgotPassword() {
     );
     
     if (response.status === 429) {
-      alert(
-    "Muitas solicitações de recuperação. Aguarde um minuto e tente novamente."
-  );
+      setNotification({
+        message:
+          "Muitas solicitações de recuperação. Aguarde um minuto e tente novamente.",
+        type: "error",
+      });
+
   return;
 }
 
 if (!response.ok) {
-  alert("Não foi possível enviar o e-mail de recuperação.");
+  setNotification({
+     message: "Não foi possível enviar o e-mail de recuperação.",
+   type: "error",
+  });
   return;
 }
 
-    alert("Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada.");
+   setNotification({
+     message: "Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada.",
+     type: "success",
+    });
     navigate("/");
   } catch {
-    alert("Erro ao conectar com o servidor.");
+    setNotification({
+      message: "Erro ao conectar com o servidor.",
+      type: "error",
+    });
   }
 };
 
   return (
   <div className="forgot-page">
+    {notification && (
+  <div className={`notification-toast ${notification.type}`}>
+    <span>{notification.message}</span>
+
+    <button
+      type="button"
+      onClick={() => setNotification(null)}
+    >
+      ×
+    </button>
+  </div>
+)}
     <div className="forgot-container">
 
       <div className="forgot-brand">

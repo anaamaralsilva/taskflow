@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./ResetPassword.css";
 
@@ -10,19 +10,45 @@ function ResetPassword() {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [notification, setNotification] = useState<{
+     message: string;
+     type: "success" | "error";
+    } | null>(null);
+
+    useEffect(() => {
+  if (!notification) {
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+
+  return () => clearTimeout(timer);
+}, [notification]);
+
   const handleResetPassword = async () => {
   if (!newPassword || !confirmPassword) {
-    alert("Preencha os dois campos.");
+    setNotification({
+      message: "Preencha os dois campos.",
+      type: "error",
+    });
     return;
   }
 
   if (newPassword !== confirmPassword) {
-    alert("As senhas não coincidem.");
+    setNotification({
+      message: "As senhas não coincidem.",
+      type: "error",
+    });
     return;
   }
 
   if (!token) {
-    alert("Token de recuperação inválido.");
+    setNotification({
+      message: "Token de recuperação inválido.",
+      type: "error",
+    });
     return;
   }
 
@@ -44,19 +70,40 @@ function ResetPassword() {
     const data = await response.json();
 
     if (!response.ok) {
-      alert(data.message || "Não foi possível redefinir a senha.");
+      setNotification({
+        message: data.message || "Não foi possível redefinir a senha.",
+        type: "error",
+      });
       return;
     }
 
-    alert("Senha redefinida com sucesso!");
+    setNotification({
+      message: "Senha redefinida com sucesso!",
+      type: "success",
+    });
     navigate("/");
   } catch {
-    alert("Erro ao conectar com o servidor.");
+    setNotification({
+      message: "Erro ao conectar com o servidor.",
+      type: "error",
+    });
   }
 };
 
   return (
   <div className="reset-page">
+    {notification && (
+  <div className={`notification-toast ${notification.type}`}>
+    <span>{notification.message}</span>
+
+    <button
+      type="button"
+      onClick={() => setNotification(null)}
+    >
+      ×
+    </button>
+  </div>
+)}
     <div className="reset-container">
 
       <div className="reset-brand">
