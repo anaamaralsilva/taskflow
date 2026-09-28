@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
+import Sidebar from "../components/Sidebar";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -238,6 +239,7 @@ setCompletedTasksCount(completedTasks.length);
 
 return (
   <div className="dashboard-page">
+<Sidebar />
 
     {notification && (
   <div className={`notification-toast ${notification.type}`}>
@@ -348,55 +350,6 @@ return (
     </div>
   </div>
 )}
-
-    <aside className="dashboard-sidebar">
-      <div>
-        <div className="sidebar-logo">
-          <div className="sidebar-logo-icon">T</div>
-
-          <div>
-            <strong>TaskFlow</strong>
-            <span>Workspace</span>
-          </div>
-        </div>
-
-        <nav className="sidebar-nav">
-          <button className="sidebar-link active" type="button">
-            <span className="sidebar-icon">⌂</span>
-            Visão geral
-          </button>
-
-          <button className="sidebar-link" type="button">
-            <span className="sidebar-icon">▣</span>
-            Projetos
-          </button>
-
-          <button className="sidebar-link" type="button">
-            <span className="sidebar-icon">✓</span>
-            Tarefas
-          </button>
-        </nav>
-      </div>
-
-      <div className="sidebar-bottom">
-        <div className="sidebar-user">
-          <div className="sidebar-avatar">TF</div>
-
-          <div>
-            <strong>Minha conta</strong>
-            <span>TaskFlow</span>
-          </div>
-        </div>
-
-        <button
-          className="sidebar-logout"
-          type="button"
-          onClick={handleLogout}
-        >
-          Sair
-        </button>
-      </div>
-    </aside>
 
     <main className="dashboard-main">
 

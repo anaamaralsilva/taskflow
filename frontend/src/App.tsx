@@ -6,6 +6,8 @@ import ProjectDetails from "./pages/ProjectDetails";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Projects from "./pages/Projects";
+import Tasks from "./pages/Tasks";
 
 function App() {
   return (
@@ -20,10 +22,28 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route
+  path="/tasks"
+  element={
+    <ProtectedRoute>
+      <Tasks />
+    </ProtectedRoute>
+  }
+/>
+
+        <Route
   path="/dashboard"
   element={
     <ProtectedRoute>
       <Dashboard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/projects"
+  element={
+    <ProtectedRoute>
+      <Projects />
     </ProtectedRoute>
   }
 />
