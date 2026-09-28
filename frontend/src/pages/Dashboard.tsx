@@ -7,6 +7,9 @@ function Dashboard() {
   const [projectsCount, setProjectsCount] = useState(0);
   const [projects, setProjects] = useState<any[]>([]);
   const [tasksCount, setTasksCount] = useState(0);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
+const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [pendingTasksCount, setPendingTasksCount] = useState(0);
   const [completedTasksCount, setCompletedTasksCount] = useState(0);
   const [showProjectForm, setShowProjectForm] = useState(false);
@@ -19,6 +22,57 @@ function Dashboard() {
   message: string;
   type: "success" | "error";
 } | null>(null);
+
+const year = currentDate.getFullYear();
+const month = currentDate.getMonth();
+
+const firstDayOfMonth = new Date(year, month, 1);
+const lastDayOfMonth = new Date(year, month + 1, 0);
+
+const daysInMonth = lastDayOfMonth.getDate();
+const startingDay = firstDayOfMonth.getDay();
+
+const calendarDays = [
+  ...Array(startingDay).fill(null),
+  ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
+];
+
+const monthName = currentDate.toLocaleDateString("pt-BR", {
+  month: "long",
+  year: "numeric",
+});
+
+const selectedDayProjects = selectedDate
+  ? projects.filter((project) => {
+      if (!project.dueDate || project.dueDate.startsWith("0001-")) {
+        return false;
+      }
+
+      const dueDate = new Date(project.dueDate);
+
+      return (
+        dueDate.getFullYear() === selectedDate.getFullYear() &&
+        dueDate.getMonth() === selectedDate.getMonth() &&
+        dueDate.getDate() === selectedDate.getDate()
+      );
+    })
+  : [];
+
+const selectedDayTasks = selectedDate
+  ? tasks.filter((task) => {
+      if (!task.dueDate || task.dueDate.startsWith("0001-")) {
+        return false;
+      }
+
+      const dueDate = new Date(task.dueDate);
+
+      return (
+        dueDate.getFullYear() === selectedDate.getFullYear() &&
+        dueDate.getMonth() === selectedDate.getMonth() &&
+        dueDate.getDate() === selectedDate.getDate()
+      );
+    })
+  : [];
 
   useEffect(() => {
   if (!notification) {
@@ -159,6 +213,7 @@ if (tasksResponse.status === 401) {
 }
 if (tasksResponse.ok) {
   const tasksData = await tasksResponse.json();
+  setTasks(tasksData);
   setTasksCount(tasksData.length);
 
   const pendingTasks = tasksData.filter(
@@ -430,7 +485,23 @@ return (
         </div>
 
         <div className="projects-list">
-          {projects.map((project) => (
+          {projects.map((project) => {
+            const projectTasks = tasks.filter(
+              (task) => task.projectId === project.id
+             );
+
+            const completedProjectTasks = projectTasks.filter(
+              (task) => task.status === "Completed"
+            ).length;
+
+             const projectProgress =
+              projectTasks.length > 0
+                ? Math.round(
+                    (completedProjectTasks / projectTasks.length) * 100
+                  )
+                : 0;
+
+           return (
             <div
               className="project-item"
               key={project.id}
@@ -441,8 +512,18 @@ return (
                   {project.name.charAt(0).toUpperCase()}
                 </div>
 
-                <span className="project-status">
-                  {project.status}
+                <span
+  className={`project-status status-${project.status
+    .toLowerCase()
+    .replaceAll(" ", "-")}`}
+>
+  {project.status === "Active"
+    ? "Ativo"
+    : project.status === "In Progress"
+    ? "Em andamento"
+    : project.status === "Completed"
+    ? "Concluído"
+    : project.status}
                 </span>
               </div>
 
@@ -452,17 +533,244 @@ return (
                 <p>
                   {project.description || "Projeto sem descrição."}
                 </p>
+                <span className="project-due-date">
+                   Prazo:{" "}
+                     {project.dueDate && !project.dueDate.startsWith("0001-")
+                       ? new Date(project.dueDate).toLocaleDateString("pt-BR")
+                     : "Não definido"}
+                </span>
               </div>
+             <div className="project-progress-mini">
+  <div className="project-progress-mini-header">
+    <span>Progresso</span>
+    <strong>{projectProgress}%</strong>
+  </div>
 
+  <div className="project-progress-mini-bar">
+    <div
+      className="project-progress-mini-fill"
+      style={{ width: `${projectProgress}%` }}
+    />
+  </div>
+
+  <span className="project-progress-mini-text">
+  {projectTasks.length === 0
+    ? "Nenhuma tarefa cadastrada"
+    : `${completedProjectTasks} de ${projectTasks.length} ${
+        projectTasks.length === 1
+          ? "tarefa concluída"
+          : "tarefas concluídas"
+      }`}
+</span>
+</div>
               <div className="project-footer">
                 <span>Abrir projeto</span>
                 <span>→</span>
               </div>
             </div>
-          ))}
+           );
+          })}
         </div>
 
       </section>
+      <section className="calendar-section">
+  <div className="calendar-header">
+    <div>
+      <span className="section-label">CALENDÁRIO</span>
+      <h2>Agenda</h2>
+      <p>Acompanhe os prazos dos seus projetos e tarefas.</p>
+    </div>
+
+    <div className="calendar-navigation">
+      <button
+        type="button"
+        onClick={() =>
+          setCurrentDate(new Date(year, month - 1, 1))
+        }
+      >
+        ‹
+      </button>
+
+      <strong>{monthName}</strong>
+
+      <button
+        type="button"
+        onClick={() =>
+          setCurrentDate(new Date(year, month + 1, 1))
+        }
+      >
+        ›
+      </button>
+    </div>
+  </div>
+
+  <div className="calendar-weekdays">
+    <span>DOM</span>
+    <span>SEG</span>
+    <span>TER</span>
+    <span>QUA</span>
+    <span>QUI</span>
+    <span>SEX</span>
+    <span>SÁB</span>
+  </div>
+
+  <div className="calendar-grid">
+    {calendarDays.map((day, index) => {
+  if (day === null) {
+    return (
+      <div
+        className="calendar-day empty"
+        key={`empty-${index}`}
+      />
+    );
+  }
+
+  const date = new Date(year, month, day);
+
+  const today = new Date();
+
+  const isToday =
+   today.getFullYear() === year &&
+   today.getMonth() === month &&
+   today.getDate() === day;
+
+  const projectEvents = projects.filter((project) => {
+    if (!project.dueDate || project.dueDate.startsWith("0001-")) {
+      return false;
+    }
+
+    const dueDate = new Date(project.dueDate);
+
+    return (
+      dueDate.getFullYear() === date.getFullYear() &&
+      dueDate.getMonth() === date.getMonth() &&
+      dueDate.getDate() === date.getDate()
+    );
+  });
+
+  const taskEvents = tasks.filter((task) => {
+    if (!task.dueDate || task.dueDate.startsWith("0001-")) {
+      return false;
+    }
+
+    const dueDate = new Date(task.dueDate);
+
+    return (
+      dueDate.getFullYear() === date.getFullYear() &&
+      dueDate.getMonth() === date.getMonth() &&
+      dueDate.getDate() === date.getDate()
+    );
+  });
+
+  return (
+        <button
+  type="button"
+  className={`calendar-day ${
+  selectedDate &&
+  selectedDate.getFullYear() === year &&
+  selectedDate.getMonth() === month &&
+  selectedDate.getDate() === day
+    ? "selected"
+    : ""
+} ${isToday ? "today" : ""}`}
+onClick={() =>
+  setSelectedDate(new Date(year, month, day))
+}
+>
+  <span className="calendar-day-number">{day}</span>
+
+  {isToday && (
+  <span className="calendar-today-label">HOJE</span>
+)}
+
+  <div className="calendar-events">
+    {projectEvents.map((project) => (
+      <div
+        className="calendar-event project-event"
+        key={`project-${project.id}`}
+      >
+        {project.name}
+      </div>
+    ))}
+
+    {taskEvents.map((task) => (
+      <div
+        className="calendar-event task-event"
+        key={`task-${task.id}`}
+      >
+        {task.title}
+      </div>
+    ))}
+  </div>
+</button>
+       );
+    })}
+  </div>
+  {selectedDate && (
+  <div className="selected-day-panel">
+    <div className="selected-day-header">
+      <div>
+        <span className="section-label">DIA SELECIONADO</span>
+
+        <h3>
+          {selectedDate.toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })}
+        </h3>
+      </div>
+
+      <button
+        type="button"
+        className="selected-day-close"
+        onClick={() => setSelectedDate(null)}
+      >
+        ×
+      </button>
+    </div>
+
+    {selectedDayProjects.length === 0 &&
+    selectedDayTasks.length === 0 ? (
+      <div className="selected-day-empty">
+        Nenhum compromisso para este dia.
+      </div>
+    ) : (
+      <div className="selected-day-events">
+        {selectedDayProjects.map((project) => (
+          <div
+            className="selected-event-card project"
+            key={`selected-project-${project.id}`}
+          >
+            <span>PROJETO</span>
+            <strong>{project.name}</strong>
+          </div>
+        ))}
+
+        {selectedDayTasks.map((task) => (
+          <div
+            className="selected-event-card task"
+            key={`selected-task-${task.id}`}
+          >
+            <span>TAREFA</span>
+            <strong>{task.title}</strong>
+
+            <small>
+              {task.status === "Pending"
+                ? "Pendente"
+                : task.status === "In Progress"
+                ? "Em andamento"
+                : task.status === "Completed"
+                ? "Concluída"
+                : task.status}
+            </small>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+)}
+</section>
 
     </main>
 
