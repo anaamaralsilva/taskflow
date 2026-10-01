@@ -31,7 +31,8 @@ function Tasks() {
 
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
-
+  
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 const [notification, setNotification] = useState<{
   message: string;
   type: "success" | "error";
@@ -131,7 +132,43 @@ const [notification, setNotification] = useState<{
 
     return new Date(date).toLocaleDateString("pt-BR");
   };
+const handleDeleteTask = async () => {
+  if (!taskToDelete) return;
 
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `http://localhost:5025/api/tasks/${taskToDelete.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Erro ao excluir tarefa.");
+    }
+
+    setTasks((currentTasks) =>
+      currentTasks.filter((task) => task.id !== taskToDelete.id)
+    );
+
+    setNotification({
+      message: "Tarefa excluída com sucesso!",
+      type: "success",
+    });
+
+    setTaskToDelete(null);
+  } catch {
+    setNotification({
+      message: "Não foi possível excluir a tarefa.",
+      type: "error",
+    });
+  }
+};
   return (
     <div className="tasks-page">
       <Sidebar />
@@ -158,6 +195,38 @@ const [notification, setNotification] = useState<{
     }}
     onNotification={setNotification}
   />
+)}
+{taskToDelete && (
+  <div className="tasks-delete-overlay">
+    <div className="tasks-delete-modal">
+      <div className="tasks-delete-icon">!</div>
+
+      <h2>Excluir tarefa?</h2>
+
+      <p>
+        Tem certeza de que deseja excluir esta tarefa? Esta ação não
+        poderá ser desfeita.
+      </p>
+
+      <div className="tasks-delete-actions">
+        <button
+          type="button"
+          className="tasks-delete-cancel"
+          onClick={() => setTaskToDelete(null)}
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          className="tasks-delete-confirm"
+          onClick={handleDeleteTask}
+        >
+          Excluir tarefa
+        </button>
+      </div>
+    </div>
+  </div>
 )}
 
 {notification && (
@@ -340,6 +409,14 @@ const [notification, setNotification] = useState<{
   >
     Editar
   </button>
+
+<button
+  type="button"
+  className="tasks-delete-button"
+  onClick={() => setTaskToDelete(task)}
+>
+  Excluir
+</button>
 
   <button
     type="button"
