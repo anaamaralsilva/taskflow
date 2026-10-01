@@ -138,6 +138,27 @@
   cursor: pointer;
 }
 
+.projects-new-button {
+  padding: 10px 15px;
+  border: 1px solid #7657e8;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7657e8, #956cf1);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.projects-new-button:hover {
+  filter: brightness(1.08);
+}
+
+.projects-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .projects-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -413,6 +434,28 @@
 ========================= */
 
 @media (max-width: 768px) {
+  .projects-header-actions {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.projects-new-button,
+.projects-back-button {
+  height: 34px;
+  padding: 0 11px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.projects-new-button {
+  min-width: 112px;
+}
+
+.projects-back-button {
+  min-width: 112px;
+}
+
   .projects-page {
   display: block;
   width: 100%;
@@ -428,13 +471,21 @@
   }
 
   .projects-topbar h1 {
-    font-size: 25px;
-  }
+  font-size: 22px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
 
-  .projects-topbar p {
-    max-width: 250px;
-    font-size: 11px;
-  }
+.projects-topbar p {
+  max-width: 245px;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.projects-topbar > div:first-child {
+  min-width: 0;
+}
 
   .projects-back-button {
     padding: 8px 10px;
@@ -484,4 +535,33 @@
   .projects-card {
     padding: 15px;
   }
+
+  .projects-topbar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
 }
+
+.projects-topbar p {
+  max-width: none;
+  width: 100%;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.projects-header-actions {
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.projects-new-button,
+.projects-back-button {
+  width: auto;
+  min-width: 112px;
+}
+}
+

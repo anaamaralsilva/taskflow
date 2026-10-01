@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Tasks.css";
 import Sidebar from "../components/Sidebar";
+import TaskModal from "../components/TaskModal";
 
 type Task = {
   id: number;
@@ -27,6 +28,14 @@ function Tasks() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [loading, setLoading] = useState(true);
+
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+
+const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error";
+} | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -126,25 +135,73 @@ function Tasks() {
   return (
     <div className="tasks-page">
       <Sidebar />
+     {showTaskForm && (
+  <TaskModal
+    projects={projects}
+    taskToEdit={taskToEdit}
+    onClose={() => {
+      setShowTaskForm(false);
+      setTaskToEdit(null);
+    }}
+    onTaskCreated={(createdTask) => {
+      setTasks((currentTasks) => [
+        ...currentTasks,
+        createdTask,
+      ]);
+    }}
+    onTaskUpdated={(updatedTask) => {
+      setTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task.id === updatedTask.id ? updatedTask : task
+        )
+      );
+    }}
+    onNotification={setNotification}
+  />
+)}
+
+{notification && (
+  <div className={`notification-toast ${notification.type}`}>
+    <span>{notification.message}</span>
+
+    <button
+      type="button"
+      onClick={() => setNotification(null)}
+    >
+      ×
+    </button>
+  </div>
+)}
 
       <main className="tasks-main">
+      
         <header className="tasks-topbar">
-          <div>
-            <span className="tasks-eyebrow">TAREFAS</span>
-            <h1>Todas as tarefas</h1>
-            <p>
-              Acompanhe suas atividades, prioridades e prazos em um só lugar.
-            </p>
-          </div>
+  <div>
+    <span className="tasks-eyebrow">TAREFAS</span>
+    <h1>Todas as tarefas</h1>
+    <p>
+      Acompanhe suas atividades, prioridades e prazos em um só lugar.
+    </p>
+  </div>
 
-          <button
-            type="button"
-            className="tasks-back-button"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Visão geral
-          </button>
-        </header>
+        <div className="tasks-header-actions">
+  <button
+    type="button"
+    className="tasks-new-button"
+    onClick={() => setShowTaskForm(true)}
+  >
+    + Nova tarefa
+  </button>
+
+  <button
+    type="button"
+    className="tasks-back-button"
+    onClick={() => navigate("/dashboard")}
+  >
+    ← Visão geral
+  </button>
+</div>
+</header>
 
         <section className="tasks-summary">
           <div>
@@ -272,13 +329,26 @@ function Tasks() {
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    className="tasks-open-button"
-                    onClick={() => navigate(`/projects/${task.projectId}`)}
-                  >
-                    Abrir projeto →
-                  </button>
+                 <div className="tasks-item-actions">
+  <button
+    type="button"
+    className="tasks-edit-button"
+    onClick={() => {
+      setTaskToEdit(task);
+      setShowTaskForm(true);
+    }}
+  >
+    Editar
+  </button>
+
+  <button
+    type="button"
+    className="tasks-open-button"
+    onClick={() => navigate(`/projects/${task.projectId}`)}
+  >
+    Abrir projeto →
+  </button>
+</div>
                 </article>
               ))}
             </div>

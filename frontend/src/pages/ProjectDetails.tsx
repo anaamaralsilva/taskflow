@@ -564,9 +564,9 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
   </div>
       <button
   className="back-button"
-  onClick={() => navigate("/dashboard")}
+  onClick={() => navigate(-1)}
 >
-  ← Voltar ao Dashboard
+  ← Voltar
 </button>
 
       {project ? (

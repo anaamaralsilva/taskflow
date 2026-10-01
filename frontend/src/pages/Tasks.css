@@ -126,6 +126,27 @@
   cursor: pointer;
 }
 
+.tasks-new-button {
+  padding: 10px 15px;
+  border: 1px solid #7657e8;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7657e8, #956cf1);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.tasks-new-button:hover {
+  filter: brightness(1.08);
+}
+
+.tasks-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .tasks-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -479,4 +500,46 @@
   .tasks-open-button {
     width: 100%;
   }
+  @media (max-width: 600px) {
+  .tasks-topbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .tasks-topbar > div:first-child {
+    width: 100%;
+  }
+
+  .tasks-topbar h1 {
+    margin: 6px 0 4px;
+    font-size: 24px;
+    line-height: 1.1;
+  }
+
+  .tasks-topbar p {
+    max-width: 100%;
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .tasks-header-actions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .tasks-new-button,
+  .tasks-back-button {
+    width: auto;
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+}
 }

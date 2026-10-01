@@ -172,7 +172,25 @@ public async Task<IActionResult> UpdateTask(int id, UpdateTaskRequest request)
     task.Priority = request.Priority;
     task.DueDate = request.DueDate;
 
-    await _context.SaveChangesAsync();
+var projectTasks = await _context.Tasks
+    .Where(t => t.ProjectId == task.ProjectId)
+    .ToListAsync();
+
+var allTasksCompleted = projectTasks.Count > 0 &&
+    projectTasks.All(t => t.Id == task.Id
+        ? request.Status == "Completed"
+        : t.Status == "Completed");
+
+if (allTasksCompleted)
+{
+    task.Project.Status = "Completed";
+}
+else if (task.Project.Status == "Completed")
+{
+    task.Project.Status = "In Progress";
+}
+
+await _context.SaveChangesAsync();
 
     return Ok(new
     {

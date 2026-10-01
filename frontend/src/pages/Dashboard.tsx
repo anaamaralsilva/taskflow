@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import Sidebar from "../components/Sidebar";
+import ProjectModal from "../components/ProjectModal";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -10,14 +11,10 @@ function Dashboard() {
   const [tasksCount, setTasksCount] = useState(0);
   const [tasks, setTasks] = useState<any[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [pendingTasksCount, setPendingTasksCount] = useState(0);
   const [completedTasksCount, setCompletedTasksCount] = useState(0);
   const [showProjectForm, setShowProjectForm] = useState(false);
-  const [newProjectName, setNewProjectName] = useState("");
-  const [newProjectDescription, setNewProjectDescription] = useState("");
-  const [newProjectStartDate, setNewProjectStartDate] = useState("");
-  const [newProjectDueDate, setNewProjectDueDate] = useState("");
 
   const [notification, setNotification] = useState<{
   message: string;
@@ -91,91 +88,6 @@ const selectedDayTasks = selectedDate
     localStorage.removeItem("token");
     navigate("/");
   };
-
-  const handleCreateProject = async () => {
-  if (!newProjectName.trim()) {
-    setNotification({
-      message: "Digite o nome do projeto.",
-      type: "error",
-    });
-    return;
-  }
-
-  if (!newProjectStartDate || !newProjectDueDate) {
-  setNotification({
-  message: "Preencha a data de início e o prazo.",
-  type: "error",
-});
-  return;
-}
-
-if (newProjectDueDate < newProjectStartDate) {
-  setNotification({
-  message: "O prazo não pode ser anterior à data de início.",
-  type: "error",
-});
-  return;
-}
-
-  const token = localStorage.getItem("token");
-
-  try {
-    const response = await fetch("http://localhost:5025/api/projects", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-      name: newProjectName,
-      description: newProjectDescription,
-      status: "In Progress",
-      startDate: newProjectStartDate,
-      dueDate: newProjectDueDate,
-    }),
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem("token");
-      navigate("/");
-      return;
-    }
-
-    if (!response.ok) {
-      setNotification({
-      message: "Não foi possível criar o projeto.",
-      type: "error",
-     });
-      return;
-    }
-
-    const createdProject = await response.json();
-
-    setProjects((currentProjects: any[]) => [
-      ...currentProjects,
-      createdProject,
-    ]);
-
-    setProjectsCount((currentCount) => currentCount + 1);
-
-    setNewProjectName("");
-    setNewProjectDescription("");
-    setNewProjectStartDate("");
-    setNewProjectDueDate("");
-    setShowProjectForm(false);
-
-    setNotification({
-    message: "Projeto criado com sucesso!",
-    type: "success",
-  });
-  } catch (error) {
-    console.error(error);
-    setNotification({
-    message: "Não foi possível conectar ao servidor.",
-    type: "error",
-  });
-  }
-};
 
   useEffect(() => {
   const loadProjects = async () => {
@@ -255,100 +167,18 @@ return (
 )}
 
     {showProjectForm && (
-  <div className="project-modal-overlay">
-    <div className="project-modal">
+  <ProjectModal
+    onClose={() => setShowProjectForm(false)}
+    onProjectCreated={(createdProject) => {
+      setProjects((currentProjects: any[]) => [
+        ...currentProjects,
+        createdProject,
+      ]);
 
-      <div className="project-modal-header">
-        <div>
-          <span className="section-label">NOVO PROJETO</span>
-          <h2>Criar projeto</h2>
-          <p>Adicione as informações do seu novo projeto.</p>
-        </div>
-
-        <button
-          className="project-modal-close"
-          type="button"
-          onClick={() => setShowProjectForm(false)}
-        >
-          ×
-        </button>
-      </div>
-
-      <div className="project-modal-form">
-        <div className="project-form-group">
-          <label htmlFor="projectName">Nome do projeto</label>
-
-          <input
-            id="projectName"
-            type="text"
-            placeholder="Ex: TaskFlow Platform"
-            value={newProjectName}
-            onChange={(e) => setNewProjectName(e.target.value)}
-          />
-        </div>
-
-        <div className="project-dates-row">
-  <div className="project-form-group">
-    <label htmlFor="projectStartDate">Data de início</label>
-
-    <input
-      id="projectStartDate"
-      type="date"
-      value={newProjectStartDate}
-      onChange={(e) => setNewProjectStartDate(e.target.value)}
-    />
-  </div>
-
-  <div className="project-form-group">
-    <label htmlFor="projectDueDate">Prazo</label>
-
-    <input
-      id="projectDueDate"
-      type="date"
-      value={newProjectDueDate}
-      onChange={(e) => setNewProjectDueDate(e.target.value)}
-    />
-  </div>
-</div>
-
-        <div className="project-form-group">
-          <label htmlFor="projectDescription">Descrição</label>
-
-          <textarea
-            id="projectDescription"
-            placeholder="Descreva brevemente o objetivo do projeto..."
-            value={newProjectDescription}
-            onChange={(e) => setNewProjectDescription(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="project-modal-actions">
-        <button
-          className="project-cancel-button"
-          type="button"
-          onClick={() => {
-            setShowProjectForm(false);
-            setNewProjectName("");
-            setNewProjectDescription("");
-            setNewProjectStartDate("");
-            setNewProjectDueDate("");
-          }}
-        >
-          Cancelar
-        </button>
-
-        <button
-          className="project-create-button"
-          type="button"
-          onClick={handleCreateProject}
-        >
-          Criar projeto
-        </button>
-      </div>
-
-    </div>
-  </div>
+      setProjectsCount((currentCount) => currentCount + 1);
+    }}
+    onNotification={setNotification}
+  />
 )}
 
     <main className="dashboard-main">

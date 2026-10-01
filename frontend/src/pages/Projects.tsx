@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Projects.css";
 import Sidebar from "../components/Sidebar";
+import ProjectModal from "../components/ProjectModal";
 
 type Project = {
   id: number;
@@ -26,6 +27,12 @@ function Projects() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [showProjectForm, setShowProjectForm] = useState(false);
+
+const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error";
+} | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -108,7 +115,30 @@ function Projects() {
   return (
     <div className="projects-page">
       <Sidebar />
+      {showProjectForm && (
+  <ProjectModal
+    onClose={() => setShowProjectForm(false)}
+    onProjectCreated={(createdProject) => {
+      setProjects((currentProjects) => [
+        ...currentProjects,
+        createdProject,
+      ]);
+    }}
+    onNotification={setNotification}
+  />
+)}
+{notification && (
+  <div className={`notification-toast ${notification.type}`}>
+    <span>{notification.message}</span>
 
+    <button
+      type="button"
+      onClick={() => setNotification(null)}
+    >
+      ×
+    </button>
+  </div>
+)}
       <main className="projects-main">
         <header className="projects-topbar">
           <div>
@@ -119,13 +149,23 @@ function Projects() {
             </p>
           </div>
 
-          <button
-            type="button"
-            className="projects-back-button"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Visão geral
-          </button>
+          <div className="projects-header-actions">
+  <button
+    type="button"
+    className="projects-new-button"
+    onClick={() => setShowProjectForm(true)}
+  >
+    + Novo projeto
+  </button>
+
+  <button
+    type="button"
+    className="projects-back-button"
+    onClick={() => navigate("/dashboard")}
+  >
+    ← Visão geral
+  </button>
+</div>
         </header>
 
         <section className="projects-summary">
