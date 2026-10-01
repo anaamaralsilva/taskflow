@@ -50,7 +50,7 @@ public class TasksController : ControllerBase
             Title = request.Title,
             Description = request.Description,
             Priority = request.Priority,
-            DueDate = request.DueDate,
+            DueDate = DateTime.SpecifyKind(request.DueDate, DateTimeKind.Utc),
             ProjectId = request.ProjectId,
             Status = request.Status        };
 
