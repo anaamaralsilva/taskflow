@@ -397,10 +397,6 @@
 ========================= */
 
 @media (max-width: 1000px) {
-  .projects-sidebar {
-    display: none;
-  }
-
   .projects-main {
     width: 100%;
     margin-left: 0;
@@ -417,6 +413,12 @@
 ========================= */
 
 @media (max-width: 768px) {
+  .projects-page {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
   .projects-main {
     padding: 20px 16px;
   }

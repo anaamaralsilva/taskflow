@@ -59,13 +59,23 @@ function Register() {
     });
 
     if (!response.ok) {
-    setNotification({
-      message:
-      "Não foi possível realizar o cadastro. A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial.",
-      type: "error",
-     });
-     return;
-    }
+  const data = await response.json();
+
+  let errorMessage = "Não foi possível realizar o cadastro.";
+
+  if (data.message === "Email already registered.") {
+    errorMessage = "Este e-mail já está cadastrado.";
+  } else if (data.message) {
+    errorMessage = data.message;
+  }
+
+  setNotification({
+    message: errorMessage,
+    type: "error",
+  });
+
+  return;
+}
 
     setNotification({
       message: "Cadastro realizado com sucesso!",

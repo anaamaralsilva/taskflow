@@ -945,12 +945,16 @@ button {
 }
 
 @media (max-width: 600px) {
-  .dashboard-sidebar {
-    display: none;
+
+  .dashboard-page {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+  
 .projects-header-actions {
   width: 100%;
   justify-content: space-between;
-}
   }
 
   .dashboard-main {

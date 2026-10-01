@@ -380,10 +380,6 @@
 }
 
 @media (max-width: 1000px) {
-  .tasks-sidebar {
-    display: none;
-  }
-
   .tasks-main {
     width: 100%;
     margin-left: 0;
@@ -404,6 +400,12 @@
 }
 
 @media (max-width: 768px) {
+  .tasks-page {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
   .tasks-main {
     padding: 20px 16px;
   }
