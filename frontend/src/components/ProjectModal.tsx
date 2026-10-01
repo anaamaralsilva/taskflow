@@ -48,7 +48,7 @@ function ProjectModal({
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch("http://localhost:5025/api/projects", {
+      const response = await fetch("https://taskflow-3xqh.onrender.com/api/projects", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

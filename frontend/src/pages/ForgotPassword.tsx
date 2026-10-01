@@ -34,7 +34,7 @@ function ForgotPassword() {
 
   try {
     const response = await fetch(
-      "http://localhost:5025/api/auth/forgot-password",
+      "https://taskflow-3xqh.onrender.com/api/auth/forgot-password",
       {
         method: "POST",
         headers: {

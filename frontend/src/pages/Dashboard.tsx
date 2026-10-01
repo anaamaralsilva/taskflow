@@ -94,7 +94,7 @@ const selectedDayTasks = selectedDate
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch("http://localhost:5025/api/projects", {
+      const response = await fetch("https://taskflow-3xqh.onrender.com/api/projects", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -114,7 +114,7 @@ if (!response.ok) {
 
       setProjectsCount(data.length);
       setProjects(data);
-      const tasksResponse = await fetch("http://localhost:5025/api/tasks", {
+      const tasksResponse = await fetch("https://taskflow-3xqh.onrender.com/api/tasks", {
   headers: {
     Authorization: `Bearer ${token}`,
   },

@@ -63,7 +63,7 @@ function ProjectDetails() {
 
     try {
       const response = await fetch(
-  `http://localhost:5025/api/projects/${id}`,
+  `https://taskflow-3xqh.onrender.com/api/projects/${id}`,
   {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -85,7 +85,7 @@ if (!response.ok) {
       setProject(data);
       setProjectStatus(data.status);
       const tasksResponse = await fetch(
-  "http://localhost:5025/api/tasks",
+  "https://taskflow-3xqh.onrender.com/api/tasks",
   {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -124,7 +124,7 @@ setTaskError("");
   const token = localStorage.getItem("token");
 
   try {
-    const response = await fetch("http://localhost:5025/api/tasks", {
+    const response = await fetch("https://taskflow-3xqh.onrender.com/api/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -177,7 +177,7 @@ const handleDeleteTask = async (taskId: number) => {
 
   try {
     const response = await fetch(
-      `http://localhost:5025/api/tasks/${taskId}`,
+      `https://taskflow-3xqh.onrender.com/api/tasks/${taskId}`,
       {
         method: "DELETE",
         headers: {
@@ -221,7 +221,7 @@ const handleDeleteTask = async (taskId: number) => {
 
   try {
     const response = await fetch(
-      `http://localhost:5025/api/projects/${id}`,
+      `https://taskflow-3xqh.onrender.com/api/projects/${id}`,
       {
         method: "DELETE",
         headers: {
@@ -287,7 +287,7 @@ const handleUpdateProject = async () => {
 
   try {
     const response = await fetch(
-      `http://localhost:5025/api/projects/${id}`,
+      `https://taskflow-3xqh.onrender.com/api/projects/${id}`,
       {
         method: "PUT",
         headers: {
@@ -365,7 +365,7 @@ const handleUpdateTask = async () => {
 
   try {
     const response = await fetch(
-      `http://localhost:5025/api/tasks/${editingTaskId}`,
+      `https://taskflow-3xqh.onrender.com/api/tasks/${editingTaskId}`,
       {
         method: "PUT",
         headers: {
@@ -426,7 +426,7 @@ const handleUpdateProjectStatus = async (newStatus: string) => {
 
   try {
     const response = await fetch(
-      `http://localhost:5025/api/projects/${id}`,
+      `https://taskflow-3xqh.onrender.com/api/projects/${id}`,
       {
         method: "PUT",
         headers: {

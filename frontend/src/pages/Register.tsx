@@ -46,7 +46,7 @@ function Register() {
   }
 
   try {
-    const response = await fetch("http://localhost:5025/api/auth/register", {
+    const response = await fetch("https://taskflow-3xqh.onrender.com/api/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

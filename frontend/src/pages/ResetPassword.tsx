@@ -54,7 +54,7 @@ function ResetPassword() {
 
   try {
     const response = await fetch(
-      "http://localhost:5025/api/auth/reset-password",
+      "https://taskflow-3xqh.onrender.com/api/auth/reset-password",
       {
         method: "POST",
         headers: {

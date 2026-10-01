@@ -49,12 +49,12 @@ const [notification, setNotification] = useState<{
 
       try {
         const [tasksResponse, projectsResponse] = await Promise.all([
-          fetch("http://localhost:5025/api/tasks", {
+          fetch("https://taskflow-3xqh.onrender.com/api/tasks", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }),
-          fetch("http://localhost:5025/api/projects", {
+          fetch("https://taskflow-3xqh.onrender.com/api/projects", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -139,7 +139,7 @@ const handleDeleteTask = async () => {
 
   try {
     const response = await fetch(
-      `http://localhost:5025/api/tasks/${taskToDelete.id}`,
+      `https://taskflow-3xqh.onrender.com/api/tasks/${taskToDelete.id}`,
       {
         method: "DELETE",
         headers: {
