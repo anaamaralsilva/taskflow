@@ -36,8 +36,8 @@ public class ProjectsController : ControllerBase
         {
             Name = request.Name,
             Description = request.Description,
-            StartDate = request.StartDate,
-            DueDate = request.DueDate,
+            StartDate = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Utc),
+            DueDate = DateTime.SpecifyKind(request.DueDate, DateTimeKind.Utc),
             Status = "Active",
             CreatedByUserId = userId
         };
