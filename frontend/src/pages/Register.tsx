@@ -9,6 +9,7 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<{
   message: string;
   type: "success" | "error";
@@ -45,6 +46,7 @@ function Register() {
     return;
   }
 
+  setIsLoading(true);
   try {
     const response = await fetch("https://taskflow-3xqh.onrender.com/api/auth/register", {
       method: "POST",
@@ -87,7 +89,9 @@ function Register() {
       message: "Erro ao conectar com o servidor.",
       type: "error",
     });
-  }
+} finally {
+    setIsLoading(false);
+}
 };
 
  return (
@@ -181,12 +185,13 @@ function Register() {
           </p>
 
           <button
-            className="register-submit-button"
-            type="button"
-            onClick={handleRegister}
-          >
-            Criar conta
-          </button>
+    className="register-submit-button"
+    type="button"
+    onClick={handleRegister}
+    disabled={isLoading}
+>
+    {isLoading ? "Criando conta..." : "Criar conta"}
+</button>
 
           <div className="register-login-area">
             <span>Já possui uma conta?</span>
