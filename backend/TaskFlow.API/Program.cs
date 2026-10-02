@@ -70,7 +70,7 @@ builder.Services.AddCors(options =>
             .WithOrigins(
     "http://localhost:5173",
     "http://localhost:5174",
-    "https://taskflow-frontend-5ylh.onrender.com"
+    "https://taskflow-frontend-ja2y.onrender.com"
 )
             .AllowAnyHeader()
             .AllowAnyMethod();
