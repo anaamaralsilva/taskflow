@@ -132,14 +132,6 @@ function Login() {
           </div>
 
           <button
-            className="forgot-password-button"
-            type="button"
-            onClick={() => navigate("/forgot-password")}
-          >
-            Esqueci minha senha
-          </button>
-
-          <button
             className="login-button"
             type="button"
             onClick={handleLogin}
