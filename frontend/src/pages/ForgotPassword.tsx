@@ -5,6 +5,7 @@ import "./ForgotPassword.css";
 function ForgotPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [notification, setNotification] = useState<{
     message: string;
@@ -33,6 +34,8 @@ function ForgotPassword() {
   }
 
   try {
+    setIsLoading(true);
+
     const response = await fetch(
       "https://taskflow-3xqh.onrender.com/api/auth/forgot-password",
       {
@@ -66,13 +69,15 @@ if (!response.ok) {
      message: "Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada.",
      type: "success",
     });
-    navigate("/");
-  } catch {
-    setNotification({
-      message: "Erro ao conectar com o servidor.",
-      type: "error",
-    });
-  }
+  
+ } catch {
+  setNotification({
+    message: "Erro ao conectar com o servidor.",
+    type: "error",
+  });
+} finally {
+  setIsLoading(false);
+}
 };
 
   return (
@@ -132,12 +137,13 @@ if (!response.ok) {
           </div>
 
           <button
-            className="forgot-submit-button"
-            type="button"
-            onClick={handleForgotPassword}
-          >
-            Enviar link de recuperação
-          </button>
+  className="forgot-submit-button"
+  type="button"
+  onClick={handleForgotPassword}
+  disabled={isLoading}
+>
+  {isLoading ? "Enviando..." : "Enviar link de recuperação"}
+</button>
 
           <div className="forgot-login-area">
             <span>Lembrou sua senha?</span>
