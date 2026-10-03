@@ -1,11 +1,15 @@
 using System.Net;
 using System.Net.Mail;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace TaskFlow.API.Services;
 
 public class EmailService
 {
     private readonly IConfiguration _configuration;
+    private readonly HttpClient _httpClient = new HttpClient();
 
     public EmailService(IConfiguration configuration)
     {
@@ -13,28 +17,28 @@ public class EmailService
     }
 public async Task SendEmailAsync(string toEmail, string subject, string body)
 {
-    var smtpServer = _configuration["EmailSettings:SmtpServer"];
-    var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]!);
-    var senderEmail = _configuration["EmailSettings:SenderEmail"];
-    var appPassword = _configuration["EmailSettings:AppPassword"];
+    var apiKey = _configuration["Resend:ApiKey"];
+    _httpClient.DefaultRequestHeaders.Authorization =
+    new AuthenticationHeaderValue("Bearer", apiKey);
 
-    using var smtpClient = new SmtpClient(smtpServer, smtpPort)
+var emailData = new
 {
-    Credentials = new NetworkCredential(senderEmail, appPassword),
-    EnableSsl = true,
-    Timeout = 15000
+    from = "TaskFlow <onboarding@resend.dev>",
+    to = new[] { toEmail },
+    subject = subject,
+    html = body
 };
 
-    using var mailMessage = new MailMessage
-    {
-        From = new MailAddress(senderEmail!, "TaskFlow"),
-        Subject = subject,
-        Body = body,
-        IsBodyHtml = true
-    };
+var json = JsonSerializer.Serialize(emailData);
+var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    mailMessage.To.Add(toEmail);
+var response = await _httpClient.PostAsync(
+    "https://api.resend.com/emails",
+    content
+);
 
-    await smtpClient.SendMailAsync(mailMessage);
+response.EnsureSuccessStatusCode();
+
+return;
 }
 }
