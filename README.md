@@ -16,6 +16,26 @@ The application integrates a React and TypeScript frontend with an ASP.NET Core 
 
 ---
 
+## Screenshots
+
+### Login
+
+![TaskFlow Login](docs/images/login.png)
+
+### Dashboard
+
+![TaskFlow Dashboard](docs/images/dashboard.png)
+
+### Projects
+
+![TaskFlow Projects](docs/images/projects.png)
+
+### Tasks
+
+![TaskFlow Tasks](docs/images/tasks.png)
+
+---
+
 ## Features
 
 - User registration and authentication
