@@ -19,10 +19,11 @@ public async Task SendEmailAsync(string toEmail, string subject, string body)
     var appPassword = _configuration["EmailSettings:AppPassword"];
 
     using var smtpClient = new SmtpClient(smtpServer, smtpPort)
-    {
-        Credentials = new NetworkCredential(senderEmail, appPassword),
-        EnableSsl = true
-    };
+{
+    Credentials = new NetworkCredential(senderEmail, appPassword),
+    EnableSsl = true,
+    Timeout = 15000
+};
 
     using var mailMessage = new MailMessage
     {
