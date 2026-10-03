@@ -1,64 +1,82 @@
 # TaskFlow
 
-TaskFlow is a Full Stack project and task management platform designed to help teams organize projects, manage tasks, assign responsibilities, and track progress in a simple and efficient way.
+TaskFlow is a full-stack web application for project and task management, designed to help users organize their work, manage projects and tasks, and track progress through a modern and intuitive interface.
 
-> **Project Status:** In Development
+🌐 **Live Application:** https://taskflow-frontend-ja2y.onrender.com
 
-##  About the Project
+---
 
-TaskFlow is being developed as a complete web application focused on project and task management.
+## About the Project
 
-The platform will allow users to create and manage projects, organize tasks, define priorities and deadlines, assign team members, and monitor project progress through an interactive dashboard.
+TaskFlow was developed as a portfolio project to demonstrate the development and deployment of a complete full-stack web application.
 
-##  Technologies
+The platform allows users to create an account, securely authenticate, create and manage projects, organize tasks, define priorities and deadlines, update task status, and monitor progress through an interactive dashboard.
+
+The application integrates a React and TypeScript frontend with an ASP.NET Core Web API and a PostgreSQL database.
+
+---
+
+## Features
+
+- User registration and authentication
+- JWT authentication
+- Project creation and management
+- Task creation and management
+- Task priorities
+- Task deadlines
+- Task status tracking
+- Project progress tracking
+- Interactive dashboard
+- Search and filters
+- Responsive interface
+- REST API
+- Production deployment
+
+---
+
+## Technologies
 
 ### Frontend
+
 - React
 - TypeScript
 - Vite
+- HTML5
+- CSS3
 
 ### Backend
+
 - C#
 - ASP.NET Core Web API
 - Entity Framework Core
+- JWT Authentication
+- BCrypt
 
 ### Database
-- SQL Server
 
-### Tools
+- PostgreSQL
+- SQL Server for local development
+
+### Tools and Deployment
+
 - Git
 - GitHub
 - Visual Studio Code
 - Swagger / OpenAPI
+- Docker
+- Render
 
-##  Planned Features
+---
 
-- User registration and authentication
-- JWT authentication
-- Project management
-- Task management
-- Task assignment
-- Priority and deadline management
-- Task status tracking
-- Team management
-- Dashboard with project statistics
-- Search and filters
-- Kanban board
-- Reports
-
-##  Project Structure
+## Project Structure
 
 TaskFlow is organized into two main applications:
 
-- `backend/TaskFlow.API` — ASP.NET Core Web API
-- `frontend` — React and TypeScript application
-
-##  Development
-
-The project is currently under active development. New features and improvements will be added progressively.
-
-##  Developer
-
-**Ana Carolina Amaral Silva**
-
-Software Developer | Systems Analysis and Development
+```text
+taskflow/
+├── backend/
+│   └── TaskFlow.API/
+│       └── ASP.NET Core Web API
+│
+└── frontend/
+    └── React + TypeScript application
